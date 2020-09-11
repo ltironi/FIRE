@@ -73,7 +73,7 @@ class user(db.Model):
         self.ref = ref
         self.user_id = user_id
         self.eoybalance = eoybalance
-        self.year = emyearail
+        self.year = year
 
     def __repr__(self):
         return f"<user_if {self.user_id}>"
