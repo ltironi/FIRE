@@ -50,7 +50,8 @@ class user(db.Model):
     email = db.Column(db.String())
     hash = db.Column(db.String())
   
-    def __init__(self, fname, lname, email,hash):
+    def __init__(self, id, fname, lname, email,hash):
+        self.id = id
         self.fname = fname
         self.lname = lname
         self.email = email
