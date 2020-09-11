@@ -32,7 +32,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///fi.db")
+db = SQL("postgres://vmgdpbwufpvfdc:92e16ae05debf4703d8adb488e47b4aa3aee47dbc7b9cdc8fa48f4238e66df97@ec2-3-226-231-4.compute-1.amazonaws.com:5432/d5a1q8o64gmp0r")
 
 
 @app.route("/")
