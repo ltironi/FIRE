@@ -78,8 +78,10 @@ def chart():
 
     return render_template("chart.html",ax=ax,ay=ay,ay1=ay1,ay2=ay2)
 
-
-
+@app.route("/test", methods=["GET", "POST"])
+@login_required
+def test():
+	return render_template("test.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
