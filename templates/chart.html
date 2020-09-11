@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+
+
+<canvas id="myChart"></canvas>
+
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'line',
+
+        // The data for our dataset
+        data: {
+            labels: {{ ax | safe }},
+            datasets: [{
+                label: 'End of year balance',
+                backgroundColor: 'rgb(122, 40, 40)',
+                borderColor: 'rgb(122, 40, 40)',
+                fill: false,  //no fill here
+                data: {{ ay }}
+            },
+            {
+                label: 'min',
+                backgroundColor: 'rgb(71, 117, 186)',
+                borderColor: 'rgb(71, 117, 186)',
+                fill: false,  //no fill here
+                pointRadius: 0,
+                data: {{ ay1 }}
+            },
+            {
+                label: 'max',
+                backgroundColor: 'rgb(71, 117, 186)',
+                borderColor: 'rgb(71, 117, 186)',
+                fill: '-1', //fill until previous dataset
+                pointRadius: 0,
+                data: {{ ay2 }}            }]
+        },
+
+        // Configuration options go here
+        options: {
+
+        }
+    });
+</script>
+
+
+
+
+{% endblock %}
