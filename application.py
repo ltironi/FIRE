@@ -32,7 +32,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("postgres://vmgdpbwufpvfdc:92e16ae05debf4703d8adb488e47b4aa3aee47dbc7b9cdc8fa48f4238e66df97@ec2-3-226-231-4.compute-1.amazonaws.com:5432/d5a1q8o64gmp0r")
+#db = SQL("postgres://vmgdpbwufpvfdc:92e16ae05debf4703d8adb488e47b4aa3aee47dbc7b9cdc8fa48f4238e66df97@ec2-3-226-231-4.compute-1.amazonaws.com:5432/d5a1q8o64gmp0r")
 
 
 @app.route("/")
@@ -61,7 +61,7 @@ def add():
 @login_required
 def chart():
     user = session["user_id"]
-    data = db.execute(f"SELECT year, EOYbalance FROM balance WHERE user_id = {user} ORDER BY year")
+    #data = db.execute(f"SELECT year, EOYbalance FROM balance WHERE user_id = {user} ORDER BY year")
     print(data)
     ax = []
     ay = []
@@ -139,7 +139,7 @@ def register():
             return apology(message="You must provide a password.",code=400)
         if password != confirmation:
             return apology(message="Your password and confirmation doesn't match.",code=400)
-        db.execute("INSERT INTO users (fname, lname, email, hash) VALUES (:fname, :lname, :email, :hash)", fname=fname, lname=lname, email=email, hash=generate_password_hash(password))
+        #db.execute("INSERT INTO users (fname, lname, email, hash) VALUES (:fname, :lname, :email, :hash)", fname=fname, lname=lname, email=email, hash=generate_password_hash(password))
         return redirect("/login")
 
 @app.route("/logout")
