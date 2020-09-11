@@ -4,6 +4,5 @@ Flask-Session
 requests
 gunicorn
 psycopg2
-os-sys
 pandas
 numpy
