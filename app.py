@@ -41,7 +41,7 @@ Session(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-class user(db.Model):
+class users(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -65,12 +65,12 @@ class balance(db.Model):
 
     ref = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
-    eyobalance = db.Column(db.Float)
+    eoybalance = db.Column(db.Float)
     year = db.Column(db.Integer)
 
-    def __init__(self, user_id, eyobalance, year):
+    def __init__(self, user_id, eoybalance, year):
         self.user_id = user_id
-        self.eyobalance = eyobalance
+        self.eoybalance = eoybalance
         self.year = year
 
     def __repr__(self):
@@ -90,12 +90,17 @@ def add():
     if request.method == "POST":
         EOYbalance = request.form.get("eoybalance")
         year = request.form.get("year")
-        db.execute("INSERT INTO balance (user_id, EOYbalance, year) VALUES (:user_id, :EOYbalance, :year)", user_id=user, EOYbalance=EOYbalance, year=year)
+
+        new_balance = balance(user_id = user, eoybalance = EOYbalance, year = year)
+        db.session.add(new_balance)
+        db.session.commit()       
+        
         return redirect("/add")
     else:
-        data = db.execute(f"SELECT year, EOYbalance FROM balance WHERE user_id = {user} ORDER BY year")
+        data = balance.query.filter_by(user_id = user).all()
+
         for row in data:
-            row['EOYbalance']=usd(row['EOYbalance'])
+            row.EOYbalance=usd(row.eoybalance)
         return render_template("add.html",data=data)
 
 
@@ -104,13 +109,15 @@ def add():
 @login_required
 def chart():
     user = session["user_id"]
-    data = db.execute(f"SELECT year, EOYbalance FROM balance WHERE user_id = {user} ORDER BY year")
+     
+    data = balance.query.with_entities(balance.year, balance.eoybalance).filter_by(user_id = user).all()
+    # data = db.execute(f"SELECT year, EOYbalance FROM balance WHERE user_id = {user} ORDER BY year")
     print(data)
     ax = []
     ay = []
     for row in data:
         #ax.append(str(row['year']))
-        ay.append(int(row['EOYbalance']))
+        ay.append(int(row.eoybalance))
 
 
     ay1=canal()[0]
@@ -145,15 +152,15 @@ def login():
             return apology("must provide password", 403)
 
         # Query database for email
-        rows = db.execute("SELECT * FROM users WHERE email = :email",
-                          email=request.form.get("email"))
+        email = request.form.get("email")
+        rows = users.query.filter_by(email = email).all()
 
         # Ensure email exists and password is correct
-        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
+        if len(rows) != 1 or not check_password_hash(rows[0].hash, request.form.get("password")):
             return apology("invalid email and/or password", 403)
 
         # Remember which user has logged in
-        session["user_id"] = rows[0]["id"]
+        session["user_id"] = rows[0].id
 
         # Redirect user to home page
         return redirect("/")
@@ -186,7 +193,7 @@ def register():
             return apology(message="Your password and confirmation doesn't match.",code=400)
         password = generate_password_hash(password)
         
-        new_user = user(fname = fname, lname = lname, email = email, hash = password)
+        new_user = users(fname = fname, lname = lname, email = email, hash = password)
         db.session.add(new_user)
         db.session.commit()
 
