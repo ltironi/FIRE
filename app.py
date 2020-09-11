@@ -49,9 +49,8 @@ class user(db.Model):
     lname = db.Column(db.String())
     email = db.Column(db.String())
     hash = db.Column(db.String())
-  
-    def __init__(self, id, fname, lname, email,hash):
-        self.id = id
+
+    def __init__(self, fname, lname, email, hash):
         self.fname = fname
         self.lname = lname
         self.email = email
@@ -61,18 +60,17 @@ class user(db.Model):
         return f"<Name {self.fname}>"
 
 
-class user(db.Model):
+class balance(db.Model):
     __tablename__ = 'balance'
 
     ref = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     eyobalance = db.Column(db.Float)
     year = db.Column(db.Integer)
-  
-    def __init__(self, ref, user_id, eoybalance, year):
-        self.ref = ref
+
+    def __init__(self, user_id, eyobalance, year):
         self.user_id = user_id
-        self.eoybalance = eoybalance
+        self.eyobalance = eyobalance
         self.year = year
 
     def __repr__(self):
