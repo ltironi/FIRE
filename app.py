@@ -7,12 +7,17 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 import pandas as pd
+import psycopg2
+from psycopg2 import Error
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 from helpers import apology, login_required, usd
 from canal import canal
 
 # Configure application
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgres://vmgdpbwufpvfdc:92e16ae05debf4703d8adb488e47b4aa3aee47dbc7b9cdc8fa48f4238e66df97@ec2-3-226-231-4.compute-1.amazonaws.com:5432/d5a1q8o64gmp0r"
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -31,8 +36,47 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-# Configure CS50 Library to use SQLite database
-db = SQL("postgres://vmgdpbwufpvfdc:92e16ae05debf4703d8adb488e47b4aa3aee47dbc7b9cdc8fa48f4238e66df97@ec2-3-226-231-4.compute-1.amazonaws.com:5432/d5a1q8o64gmp0r")
+# Configure database
+#db = SQL("postgres://vmgdpbwufpvfdc:92e16ae05debf4703d8adb488e47b4aa3aee47dbc7b9cdc8fa48f4238e66df97@ec2-3-226-231-4.compute-1.amazonaws.com:5432/d5a1q8o64gmp0r")
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+class user(db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    fname = db.Column(db.String())
+    lname = db.Column(db.String())
+    email = db.Column(db.String())
+    hash = db.Column(db.String())
+  
+    def __init__(self, fname, lname, email,hash):
+        self.fname = fname
+        self.lname = lname
+        self.email = email
+        self.hash = hash
+
+    def __repr__(self):
+        return f"<Name {self.fname}>"
+
+
+class user(db.Model):
+    __tablename__ = 'balance'
+
+    ref = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    eyobalance = db.Column(db.Float)
+    year = db.Column(db.Integer)
+  
+    def __init__(self, ref, user_id, eoybalance, year):
+        self.ref = ref
+        self.user_id = user_id
+        self.eoybalance = eoybalance
+        self.year = emyearail
+
+    def __repr__(self):
+        return f"<user_if {self.user_id}>"
+
 
 
 @app.route("/")
@@ -141,7 +185,13 @@ def register():
             return apology(message="You must provide a password.",code=400)
         if password != confirmation:
             return apology(message="Your password and confirmation doesn't match.",code=400)
-        db.execute("INSERT INTO users (fname, lname, email, hash) VALUES (:fname, :lname, :email, :hash)", fname=fname, lname=lname, email=email, hash=generate_password_hash(password))
+        password = generate_password_hash(password)
+        
+        new_user = user(fname = fname, lname = lname, email = email, hash = password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        #db.execute("INSERT INTO users (fname, lname, email, hash) VALUES (:fname, :lname, :email, :hash)", fname=fname, lname=lname, email=email, hash=generate_password_hash(password))
         return redirect("/login")
 
 @app.route("/logout")
