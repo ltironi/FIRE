@@ -97,7 +97,7 @@ def add():
         
         return redirect("/add")
     else:
-        data = balance.query.filter_by(user_id = user).all()
+        data = balance.query.filter_by(user_id = user).order_by(balance.year).all()
 
         for row in data:
             row.EOYbalance=usd(row.eoybalance)
@@ -110,7 +110,7 @@ def add():
 def chart():
     user = session["user_id"]
      
-    data = balance.query.with_entities(balance.year, balance.eoybalance).filter_by(user_id = user).all()
+    data = balance.query.with_entities(balance.year, balance.eoybalance).filter_by(user_id = user).order_by(balance.year).all()
     # data = db.execute(f"SELECT year, EOYbalance FROM balance WHERE user_id = {user} ORDER BY year")
     print(data)
     ax = []
