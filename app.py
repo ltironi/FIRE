@@ -90,11 +90,15 @@ def add():
     if request.method == "POST":
         EOYbalance = request.form.get("eoybalance")
         year = request.form.get("year")
-
-        new_balance = balance(user_id = user, eoybalance = EOYbalance, year = year)
-        db.session.add(new_balance)
-        db.session.commit()       
-        
+        try:
+            new_balance = balance(user_id = user, eoybalance = EOYbalance, year = year)
+            db.session.add(new_balance)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()     
         return redirect("/add")
     else:
         data = balance.query.filter_by(user_id = user).order_by(balance.year).all()
@@ -193,10 +197,14 @@ def register():
             return apology(message="Your password and confirmation doesn't match.",code=400)
         password = generate_password_hash(password)
         
-        new_user = users(fname = fname, lname = lname, email = email, hash = password)
-        db.session.add(new_user)
-        db.session.commit()
-
+        try:
+            new_user = users(fname = fname, lname = lname, email = email, hash = password)
+            db.session.add(new_user)
+            db.session.commit()
+        except:
+            db.session.rollback()
+        finally:
+            db.session.close
         #db.execute("INSERT INTO users (fname, lname, email, hash) VALUES (:fname, :lname, :email, :hash)", fname=fname, lname=lname, email=email, hash=generate_password_hash(password))
         return redirect("/login")
 
