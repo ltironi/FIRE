@@ -14,6 +14,7 @@ from flask_migrate import Migrate
 
 from helpers import apology, login_required, usd
 from canal import canal
+from projection import proj
 
 # Configure application
 app = Flask(__name__)
@@ -77,12 +78,10 @@ class balance(db.Model):
         return f"<user_if {self.user_id}>"
 
 
-
 @app.route("/")
 @login_required
 def index():
     return render_template("index.html")
-
 @app.route("/add", methods=["GET", "POST"])
 @login_required
 def add():
@@ -113,7 +112,6 @@ def add():
 @login_required
 def chart():
     user = session["user_id"]
-     
     data = balance.query.with_entities(balance.year, balance.eoybalance).filter_by(user_id = user).order_by(balance.year).all()
     # data = db.execute(f"SELECT year, EOYbalance FROM balance WHERE user_id = {user} ORDER BY year")
     print(data)
@@ -122,15 +120,24 @@ def chart():
     for row in data:
         #ax.append(str(row['year']))
         ay.append(int(row.eoybalance))
-
-
     ay1=canal()[0]
     ay2=canal()[1]
-
     for i in range(0,len(ay1)):
         ax.append('Year '+str(i))
-
     return render_template("chart.html",ax=ax,ay=ay,ay1=ay1,ay2=ay2)
+
+@app.route("/projection", methods=["GET"])
+@login_required
+def projection():
+    user = session["user_id"]
+    projection=proj()
+    historic = projection[0].values.tolist()
+    forecast = historic + projection[1].values.tolist()
+    ax = []
+    for i in range(0,len(forecast)):
+        ax.append('Year '+str(i))    
+    return render_template("projection.html",ax=ax,ay1=historic,ay2=forecast)
+
 
 @app.route("/test", methods=["GET", "POST"])
 @login_required

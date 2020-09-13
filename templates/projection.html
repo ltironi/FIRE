@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+
+
+<canvas id="myChart"></canvas>
+
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'line',
+
+        // The data for our dataset
+        data: {
+            labels: {{ ax | safe }},
+            datasets: [{
+                label: 'Historic',
+                backgroundColor: 'rgb(122, 40, 40)',
+                borderColor: 'rgb(122, 40, 40)',
+                data: {{ ay1 }}
+            },
+            {
+                label: 'Forecast',
+                backgroundColor: 'rgb(71, 117, 186)',
+                borderColor: 'rgb(71, 117, 186)',
+                pointRadius: 0,
+                data: {{ ay2 }}            }]
+        },
+
+        // Configuration options go here
+        options: {}
+    });
+</script>
+
+
+
+
+{% endblock %}
